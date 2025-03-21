@@ -9,6 +9,7 @@ import { initPdfTool } from './js/modules/pdf-tool.js';
 import { initColorTool } from './js/modules/color-tool.js';
 import { initSettings } from './js/modules/settings.js';
 import TranslateTool from './js/modules/translate-tool.js';
+import { initEncodeTool } from './js/modules/encode-tool.js';
 // 内容脚本不能直接导入，需要通过消息通信
 
 // 初始化应用
@@ -26,6 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initDiffTool();
     initPdfTool();
     initColorTool();
+    initEncodeTool();
     // 初始化截图工具
     document.getElementById('screenshotCapture')?.addEventListener('click', function() {
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {

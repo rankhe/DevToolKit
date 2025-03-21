@@ -50,6 +50,10 @@
           <span class="icon">📸</span>
           <span class="text">智能截图</span>
         </div>
+        <div class="nav-item" data-tool="encode">
+          <span class="icon">🔒</span>
+          <span class="text">编码解码</span>
+        </div>
       </nav>
       <div class="nav-footer">
         <div class="theme-switch">
@@ -345,6 +349,79 @@
               <input type="color" id="strokeColor" value="#ff5722" title="线条颜色">
               <input type="number" id="strokeWidth" min="1" max="20" value="3" title="线条宽度">
             </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 编码解码工具 -->
+      <section class="tool-panel" id="encode-panel">
+        <div class="tool-header">
+          <h2>编码/解码工具</h2>
+          <div class="tool-actions">
+            <button class="btn" id="encodeCopy" title="复制结果">复制结果</button>
+            <button class="btn" id="encodeClear" title="清空内容">清空内容</button>
+          </div>
+        </div>
+        <div class="encode-container">
+          <div class="encode-options">
+            <select id="encodeType" class="select" title="选择编码类型">
+              <optgroup label="常见编码">
+                <option value="base64">Base64 编码</option>
+                <option value="url">URL 编码</option>
+                <option value="html">HTML 实体编码</option>
+                <option value="hex">Hex 编码</option>
+              </optgroup>
+              <optgroup label="哈希算法">
+                <option value="md5">MD5 哈希</option>
+                <option value="sha1">SHA-1 哈希</option>
+                <option value="sha256">SHA-256 哈希</option>
+                <option value="sha512">SHA-512 哈希</option>
+              </optgroup>
+            </select>
+            <select id="encodeMode" class="select" title="选择操作模式">
+              <option value="encode">编码转换</option>
+              <option value="decode">解码转换</option>
+            </select>
+            <input 
+              type="text" 
+              id="encodeSalt" 
+              placeholder="🔑 输入盐值（可选，仅用于哈希）" 
+              class="input"
+              title="为哈希算法添加盐值"
+            >
+          </div>
+          <div class="encode-content">
+            <div class="encode-input-group" data-label="输入">
+              <textarea 
+                id="encodeInput" 
+                placeholder="在此输入要处理的文本...&#10;支持多行文本处理&#10;自动检测URL格式"
+                spellcheck="false"
+              ></textarea>
+              <div class="file-upload">
+                <input 
+                  type="file" 
+                  id="encodeFile" 
+                  class="file-input"
+                  accept="text/*,image/*"
+                  title="选择要处理的文件"
+                >
+                <label for="encodeFile" class="file-label" title="选择文件进行编码或计算哈希">
+                  选择文件
+                </label>
+              </div>
+              <div id="filePreview" class="file-preview" title="文件预览区域"></div>
+            </div>
+            <div class="encode-output-group" data-label="输出">
+              <textarea 
+                id="encodeOutput" 
+                readonly 
+                placeholder="处理结果将显示在这里...&#10;支持一键复制"
+                spellcheck="false"
+              ></textarea>
+            </div>
+          </div>
+          <div class="encode-history" id="encodeHistory" title="最近的操作历史">
+            <!-- 历史记录将动态插入这里 -->
           </div>
         </div>
       </section>

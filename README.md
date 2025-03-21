@@ -155,7 +155,7 @@ DevToolKit 尊重用户隐私，所有数据处理均在本地完成，不会将
 ## 联系方式
 
 如有问题或建议，请通过以下方式联系我们：
-- 电子邮件：support@devtoolkit.example.com
+- 电子邮件：52450909@qq.com
 - GitHub Issues：[提交问题](https://github.com/example/devtoolkit/issues)
 
 ---
