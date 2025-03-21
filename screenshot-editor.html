@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>截图编辑器</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/screenshot-tool.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        .editor-header {
+            background-color: #fff;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+        
+        .editor-tools {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .editor-canvas-container {
+            flex: 1;
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        #editor-canvas {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            background-color: #fff;
+        }
+        
+        .tool-settings {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            position: absolute;
+            top: 60px;
+            left: 10px;
+            z-index: 101;
+            display: none;
+        }
+        
+        .tool-settings.active {
+            display: block;
+        }
+        
+        .editor-footer {
+            background-color: #fff;
+            padding: 10px;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            z-index: 100;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-primary {
+            background-color: #1a73e8;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="editor-header">
+        <div class="editor-tools">
+            <button class="tool-btn arrow" title="箭头" data-tool="arrow"></button>
+            <button class="tool-btn line" title="线条" data-tool="line"></button>
+            <button class="tool-btn rectangle" title="矩形" data-tool="rectangle"></button>
+            <button class="tool-btn circle" title="圆形" data-tool="circle"></button>
+            <button class="tool-btn text" title="文字" data-tool="text"></button>
+            <button class="tool-btn mosaic" title="马赛克" data-tool="mosaic"></button>
+            <button class="tool-btn blur" title="模糊" data-tool="blur"></button>
+        </div>
+        <div>
+            <button class="btn btn-secondary" id="undo-btn">撤销</button>
+            <button class="btn btn-secondary" id="redo-btn">重做</button>
+        </div>
+    </div>
+    
+    <div class="editor-canvas-container">
+        <canvas id="editor-canvas"></canvas>
+    </div>
+    
+    <div class="tool-settings" id="tool-settings">
+        <div class="color-picker">
+            <div class="color-option" style="background-color: #ff0000;" data-color="#ff0000"></div>
+            <div class="color-option" style="background-color: #00ff00;" data-color="#00ff00"></div>
+            <div class="color-option" style="background-color: #0000ff;" data-color="#0000ff"></div>
+            <div class="color-option" style="background-color: #ffff00;" data-color="#ffff00"></div>
+            <div class="color-option" style="background-color: #ff00ff;" data-color="#ff00ff"></div>
+            <div class="color-option active" style="background-color: #000000;" data-color="#000000"></div>
+            <div class="color-option" style="background-color: #ffffff;" data-color="#ffffff"></div>
+        </div>
+        
+        <div class="line-width">
+            <div class="width-option" data-width="2">细</div>
+            <div class="width-option active" data-width="4">中</div>
+            <div class="width-option" data-width="8">粗</div>
+        </div>
+        
+        <div class="font-selector" style="display: none;">
+            <select id="font-select">
+                <option value="Arial">Arial</option>
+                <option value="Verdana">Verdana</option>
+                <option value="Helvetica">Helvetica</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Courier New">Courier New</option>
+                <option value="宋体">宋体</option>
+                <option value="黑体">黑体</option>
+                <option value="微软雅黑">微软雅黑</option>
+                <option value="楷体">楷体</option>
+                <option value="仿宋">仿宋</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="editor-footer">
+        <button class="btn btn-secondary" id="copy-btn">复制到剪贴板</button>
+        <button class="btn btn-secondary" id="ocr-btn">OCR识别</button>
+        <div style="position: relative;">
+            <button class="btn btn-primary" id="save-btn">保存</button>
+            <div class="save-format-dropdown" style="display: none; position: absolute; bottom: 100%; right: 0; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 4px; padding: 10px;">
+                <div><button class="btn btn-secondary save-format" data-format="png">PNG</button></div>
+                <div><button class="btn btn-secondary save-format" data-format="jpeg">JPEG</button></div>
+                <div><button class="btn btn-secondary save-format" data-format="pdf">PDF</button></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/lib/jspdf.min.js"></script>
+    <script src="js/lib/tesseract.min.js"></script>
+    <script src="js/screenshot-editor.js" type="module"></script>
+</body>
+</html>

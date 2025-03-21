@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "DevToolKit",
+    "description": "扩展名称"
+  },
+  "appDescription": {
+    "message": "开发者/设计师全能工具箱",
+    "description": "扩展描述"
+  }
+}

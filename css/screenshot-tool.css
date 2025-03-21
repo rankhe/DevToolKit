@@ -1,0 +1,224 @@
+/* 截图工具样式 */
+
+.screenshot-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    cursor: crosshair;
+    z-index: 999999;
+}
+
+.screenshot-selection {
+    position: absolute;
+    border: 2px solid #1a73e8;
+    background: rgba(26, 115, 232, 0.1);
+    pointer-events: none;
+}
+
+.screenshot-tools {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+    z-index: 1000000;
+}
+
+.tool-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 4px;
+    background: #f5f5f5;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.tool-btn:hover {
+    background: #e8e8e8;
+}
+
+.tool-btn.active {
+    background: #1a73e8;
+    color: white;
+}
+
+/* 工具图标 */
+.tool-btn.arrow::before {
+    content: "↗";
+}
+
+.tool-btn.line::before {
+    content: "─";
+}
+
+.tool-btn.rectangle::before {
+    content: "□";
+}
+
+.tool-btn.circle::before {
+    content: "○";
+}
+
+.tool-btn.text::before {
+    content: "T";
+}
+
+.tool-btn.mosaic::before {
+    content: "▦";
+}
+
+.tool-btn.blur::before {
+    content: "◎";
+}
+
+/* 参考线 */
+.reference-line {
+    position: absolute;
+    background: rgba(26, 115, 232, 0.5);
+    pointer-events: none;
+}
+
+.reference-line.horizontal {
+    height: 1px;
+    width: 100%;
+}
+
+.reference-line.vertical {
+    width: 1px;
+    height: 100%;
+}
+
+/* 像素标尺 */
+.pixel-ruler {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    pointer-events: none;
+}
+
+/* 工具设置面板 */
+.tool-settings {
+    position: fixed;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    display: none;
+    z-index: 1000000;
+}
+
+.tool-settings.active {
+    display: block;
+}
+
+/* 颜色选择器 */
+.color-picker {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.color-option {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+}
+
+.color-option.active {
+    border-color: #1a73e8;
+}
+
+/* 线条粗细选择器 */
+.line-width {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.width-option {
+    width: 30px;
+    height: 20px;
+    background: #f5f5f5;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.width-option.active {
+    background: #1a73e8;
+    color: white;
+}
+
+/* 字体选择器 */
+.font-selector {
+    margin-bottom: 10px;
+}
+
+.font-selector select {
+    width: 100%;
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+/* 保存选项 */
+.save-options {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+    z-index: 1000000;
+}
+
+.save-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    background: #1a73e8;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.save-btn:hover {
+    background: #1557b0;
+}
+
+/* 延迟截图计时器 */
+.delay-timer {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    font-size: 48px;
+    padding: 20px 40px;
+    border-radius: 12px;
+    z-index: 1000000;
+}
