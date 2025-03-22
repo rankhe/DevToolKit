@@ -3,7 +3,6 @@ import { initNotificationStyle } from './js/modules/notification.js';
 import { initTheme, initToolSwitch } from './js/modules/theme.js';
 import { initJsonTool } from './js/modules/json-tool.js';
 import { initTimestampTool } from './js/modules/timestamp-tool.js';
-import { initDiffTool } from './js/modules/diff-tool.js';
 import { initChartTool } from './js/modules/chart-tool.js';
 import { initPdfTool } from './js/modules/pdf-tool.js';
 import { initColorTool } from './js/modules/color-tool.js';
@@ -24,7 +23,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const chart = initChartTool();
     initJsonTool();
     initTimestampTool();
-    initDiffTool();
     initPdfTool();
     initColorTool();
     initEncodeTool();

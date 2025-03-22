@@ -9,7 +9,6 @@
   <script src="js/lib/monaco-editor/loader.js"></script>
   <script src="js/lib/html2canvas.min.js"></script>
   <script src="js/lib/jspdf.min.js"></script>
-  <script src="js/lib/diff-match-patch.js"></script>
   <script src="js/lib/echarts.min.js"></script>
 </head>
 <body>
@@ -25,10 +24,6 @@
         <div class="nav-item" data-tool="timestamp">
           <span class="icon">⏰</span>
           <span class="text">时间戳转换</span>
-        </div>
-        <div class="nav-item" data-tool="diff">
-          <span class="icon">📝</span>
-          <span class="text">文件对比</span>
         </div>
         <div class="nav-item" data-tool="chart">
           <span class="icon">📊</span>
@@ -115,29 +110,6 @@
         </div>
       </section>
 
-      <!-- 文件对比工具 -->
-      <section class="tool-panel" id="diff-panel">
-        <div class="tool-header">
-          <h2>文件对比工具</h2>
-          <div class="tool-actions">
-            <div class="file-inputs">
-                <div class="file-input-group">
-                    <label for="originalFile">原始文件：</label>
-                    <input type="text" id="originalFilePath" readonly placeholder="选择原始文件..." />
-                    <button class="btn" id="originalFileBtn">浏览...</button>
-                </div>
-                <div class="file-input-group">
-                    <label for="modifiedFile">对比文件：</label>
-                    <input type="text" id="modifiedFilePath" readonly placeholder="选择对比文件..." />
-                    <button class="btn" id="modifiedFileBtn">浏览...</button>
-                </div>
-            </div>
-            <div class="diff-editor" id="diffEditor"></div>
-        </div>
-        <div class="diff-container">
-          <div class="diff-editor" id="diffEditor"></div>
-        </div>
-      </section>
 
       <!-- 数据可视化工具 -->
       <section class="tool-panel" id="chart-panel">
