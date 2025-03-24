@@ -2,28 +2,45 @@
 
 // 初始化上下文菜单
 chrome.runtime.onInstalled.addListener(() => {
-    chrome.contextMenus.create({
+    // 先移除所有现有的上下文菜单
+    chrome.contextMenus.removeAll(() => {
+        // 创建菜单项并处理可能的错误
+        const createMenuItem = (menuItem) => {
+            try {
+                chrome.contextMenus.create(menuItem, () => {
+                    if (chrome.runtime.lastError) {
+                        console.log(`Error creating menu item ${menuItem.id}:`, chrome.runtime.lastError);
+                    }
+                });
+            } catch (e) {
+                console.log(`Error creating menu item ${menuItem.id}:`, e);
+            }
+        };
+
+        // 使用新的错误处理方式创建菜单项
+        createMenuItem({
         id: "captureElement",
         title: "截取此元素",
         contexts: ["all"]
     });
 
-    chrome.contextMenus.create({
+    createMenuItem({
         id: "captureViewport",
         title: "截取当前视口",
         contexts: ["page"]
     });
 
-    chrome.contextMenus.create({
+    createMenuItem({
         id: "captureFullPage",
         title: "截取整个页面",
         contexts: ["page"]
     });
 
-    chrome.contextMenus.create({
+    createMenuItem({
         id: "captureSelection",
         title: "截取选定区域",
         contexts: ["page"]
+    });
     });
 });
 

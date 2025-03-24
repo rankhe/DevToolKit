@@ -4,6 +4,7 @@
   <title>DevToolKit</title>
   <meta charset="UTF-8">
   <link href="css/style.css" rel="stylesheet">
+  <link href="css/screenshot-tool.css" rel="stylesheet">
   <!-- Monaco Editor 加载 -->
   <script src="js/lib/monaco-config.js"></script>
   <script src="js/lib/monaco-editor/loader.js"></script>
@@ -330,8 +331,20 @@
         <div class="tool-header">
           <h2>编码/解码工具</h2>
           <div class="tool-actions">
-            <button class="btn" id="encodeCopy" title="复制结果">复制结果</button>
-            <button class="btn" id="encodeClear" title="清空内容">清空内容</button>
+            <button class="btn" id="encodeCopy" title="复制结果">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              复制结果
+            </button>
+            <button class="btn" id="encodeClear" title="清空内容">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              清空内容
+            </button>
           </div>
         </div>
         <div class="encode-container">
@@ -378,10 +391,18 @@
                   title="选择要处理的文件"
                 >
                 <label for="encodeFile" class="file-label" title="选择文件进行编码或计算哈希">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="12" y1="18" x2="12" y2="12"></line>
+                    <line x1="9" y1="15" x2="15" y2="15"></line>
+                  </svg>
                   选择文件
                 </label>
               </div>
-              <div id="filePreview" class="file-preview" title="文件预览区域"></div>
+              <div id="filePreview" class="file-preview" title="文件预览区域">
+                <div class="file-drop-zone">拖放文件到此处或点击上方按钮选择文件</div>
+              </div>
             </div>
             <div class="encode-output-group" data-label="输出">
               <textarea 
@@ -392,8 +413,28 @@
               ></textarea>
             </div>
           </div>
-          <div class="encode-history" id="encodeHistory" title="最近的操作历史">
-            <!-- 历史记录将动态插入这里 -->
+          <div class="encode-history" id="encodeHistory">
+            <div class="history-header">
+              <h3>历史记录</h3>
+              <button class="history-clear-btn" id="clearHistory">清除全部</button>
+            </div>
+            <div class="history-empty">
+              <p>暂无历史记录</p>
+              <p class="history-empty-tip">编码/解码操作后将自动保存到此处</p>
+            </div>
+            <!-- 历史记录项示例 -->
+            <!--
+            <div class="history-item">
+              <div class="history-info">
+                <span class="history-type">Base64 编码</span>
+                <span class="history-time">2023-05-20 14:30</span>
+              </div>
+              <div class="history-content">
+                <div class="history-input">Hello World</div>
+                <div class="history-output">SGVsbG8gV29ybGQ=</div>
+              </div>
+            </div>
+            -->
           </div>
         </div>
       </section>
