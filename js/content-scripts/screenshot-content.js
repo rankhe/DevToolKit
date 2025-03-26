@@ -1,5 +1,22 @@
 // 截图工具的内容脚本
 
+// 创建Web Worker实例
+let imageWorker;
+try {
+    imageWorker = new Worker(chrome.runtime.getURL('js/content-scripts/screenshot-worker.js'));
+    imageWorker.onmessage = handleWorkerMessage;
+} catch (error) {
+    console.error('Web Worker 初始化失败:', error);
+}
+
+// 处理Worker消息
+function handleWorkerMessage(e) {
+    const { action, result } = e.data;
+    if (action === 'mergeComplete') {
+        openScreenshotEditor(result);
+    }
+}
+
 // 初始化截图工具
 function initScreenshotTool() {
     // 创建截图工具容器
@@ -151,14 +168,9 @@ async function captureFullPage() {
         // 保存原始滚动位置
         const originalScrollTop = window.scrollY;
         
-        // 创建离屏画布
-        const canvas = document.createElement('canvas');
-        canvas.width = viewportWidth;
-        canvas.height = fullHeight;
-        const ctx = canvas.getContext('2d');
-        
         // 分段截图
         const totalSegments = Math.ceil(fullHeight / viewportHeight);
+        const imageSegments = [];
         
         for (let i = 0; i < totalSegments; i++) {
             // 滚动到指定位置
@@ -183,20 +195,46 @@ async function captureFullPage() {
                     img.src = response.dataUrl;
                 });
                 
-                // 绘制到画布上
-                ctx.drawImage(
-                    img,
-                    0, 0, viewportWidth, viewportHeight,
-                    0, i * viewportHeight, viewportWidth, viewportHeight
-                );
+                // 将图片数据添加到数组
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = viewportWidth;
+                tempCanvas.height = viewportHeight;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.drawImage(img, 0, 0);
+                
+                // 获取图片数据
+                const imageData = tempCtx.getImageData(0, 0, viewportWidth, viewportHeight);
+                imageSegments.push(imageData);
             }
         }
         
         // 恢复原始滚动位置
         window.scrollTo(0, originalScrollTop);
         
-        // 打开编辑器
-        openScreenshotEditor(canvas.toDataURL());
+        // 使用Web Worker处理图片合并
+        if (imageWorker) {
+            imageWorker.postMessage({
+                action: 'mergeImages',
+                data: {
+                    images: imageSegments,
+                    width: viewportWidth,
+                    height: fullHeight,
+                    segmentHeight: viewportHeight
+                }
+            });
+        } else {
+            // 降级处理：在主线程中合并图片
+            const canvas = document.createElement('canvas');
+            canvas.width = viewportWidth;
+            canvas.height = fullHeight;
+            const ctx = canvas.getContext('2d');
+            
+            imageSegments.forEach((imageData, i) => {
+                ctx.putImageData(imageData, 0, i * viewportHeight);
+            });
+            
+            openScreenshotEditor(canvas.toDataURL());
+        }
     } catch (error) {
         console.error('全页面截图失败:', error);
         // 确保恢复原始滚动位置
@@ -221,6 +259,21 @@ function captureSelection() {
     ruler.className = 'pixel-ruler';
     overlay.appendChild(ruler);
 
+    // 创建放大镜
+    const magnifier = document.createElement('div');
+    magnifier.className = 'magnifier';
+    overlay.appendChild(magnifier);
+
+    // 创建快捷键提示
+    const shortcuts = document.createElement('div');
+    shortcuts.className = 'shortcuts-tips';
+    shortcuts.innerHTML = `
+        <div>空格键：确认选择</div>
+        <div>Esc键：取消选择</div>
+        <div>Shift键：锁定比例</div>
+    `;
+    overlay.appendChild(shortcuts);
+
     // 跟踪鼠标状态
     let isSelecting = false;
     let startX = 0;
@@ -240,6 +293,9 @@ function captureSelection() {
 
     // 鼠标移动事件
     overlay.addEventListener('mousemove', (e) => {
+        // 更新放大镜
+        updateMagnifier(e, magnifier);
+        
         if (!isSelecting) return;
 
         let width = e.clientX - startX;
@@ -322,11 +378,21 @@ function captureSelection() {
         }
     });
 
-    // 按ESC键取消截图
+    // 键盘事件处理
     const keyHandler = (e) => {
-        if (e.key === 'Escape') {
-            document.body.removeChild(overlay);
-            document.removeEventListener('keydown', keyHandler);
+        switch (e.key) {
+            case 'Escape':
+                // 取消截图
+                document.body.removeChild(overlay);
+                document.removeEventListener('keydown', keyHandler);
+                break;
+            case ' ':
+                // 空格键确认选择
+                if (isSelecting) {
+                    e.preventDefault();
+                    confirmSelection();
+                }
+                break;
         }
     };
     document.addEventListener('keydown', keyHandler);
@@ -378,6 +444,138 @@ async function captureElement(selector) {
     }
 }
 
+// 更新放大镜
+function updateMagnifier(e, magnifier) {
+    const zoom = 3; // 放大倍率
+    const size = 100; // 放大镜大小
+    
+    // 获取鼠标位置的图像数据
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    
+    // 计算放大镜位置
+    const x = e.clientX - size / 2;
+    const y = e.clientY - size - 20; // 显示在光标上方
+    
+    // 捕获屏幕内容
+    ctx.drawImage(
+        document.documentElement,
+        e.clientX - size / zoom / 2,
+        e.clientY - size / zoom / 2,
+        size / zoom,
+        size / zoom,
+        0,
+        0,
+        size,
+        size
+    );
+    
+    // 更新放大镜样式
+    magnifier.style.cssText = `
+        position: fixed;
+        left: ${x}px;
+        top: ${y}px;
+        width: ${size}px;
+        height: ${size}px;
+        border: 2px solid #1a73e8;
+        border-radius: 50%;
+        background-image: url(${canvas.toDataURL()});
+        pointer-events: none;
+        z-index: 1000000;
+    `;
+}
+
+// 滚动截图功能
+async function captureScroll() {
+    const overlay = document.createElement('div');
+    overlay.className = 'scroll-capture-overlay';
+    overlay.innerHTML = `
+        <div class="scroll-capture-controls">
+            <button id="start-scroll-capture">开始滚动截图</button>
+            <button id="stop-scroll-capture" style="display: none;">停止截图</button>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+
+    let isCapturing = false;
+    let capturedImages = [];
+    let lastScrollTop = 0;
+    const scrollStep = window.innerHeight / 2; // 每次滚动半个屏幕高度
+
+    document.getElementById('start-scroll-capture').onclick = async () => {
+        isCapturing = true;
+        document.getElementById('start-scroll-capture').style.display = 'none';
+        document.getElementById('stop-scroll-capture').style.display = 'block';
+        
+        while (isCapturing) {
+            // 捕获当前视图
+            const response = await new Promise((resolve) => {
+                chrome.runtime.sendMessage(
+                    { action: 'captureTab' },
+                    (response) => resolve(response)
+                );
+            });
+
+            if (response && response.dataUrl) {
+                capturedImages.push(response.dataUrl);
+            }
+
+            // 滚动页面
+            lastScrollTop = window.scrollY;
+            window.scrollBy(0, scrollStep);
+
+            // 如果滚动位置没有改变，说明已到达底部
+            if (lastScrollTop === window.scrollY) {
+                stopScrollCapture();
+                break;
+            }
+
+            // 等待页面重新渲染
+            await new Promise(resolve => requestAnimationFrame(resolve));
+        }
+    };
+
+    document.getElementById('stop-scroll-capture').onclick = stopScrollCapture;
+
+    function stopScrollCapture() {
+        isCapturing = false;
+        document.body.removeChild(overlay);
+        mergeScrollCaptures(capturedImages);
+    }
+}
+
+// 合并滚动截图
+function mergeScrollCaptures(images) {
+    if (images.length === 0) return;
+
+    // 加载第一张图片来获取尺寸
+    const firstImage = new Image();
+    firstImage.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = firstImage.width;
+        canvas.height = firstImage.height * images.length;
+        const ctx = canvas.getContext('2d');
+
+        // 加载并绘制所有图片
+        let loadedCount = 0;
+        images.forEach((dataUrl, index) => {
+            const img = new Image();
+            img.onload = () => {
+                ctx.drawImage(img, 0, index * firstImage.height);
+                loadedCount++;
+
+                if (loadedCount === images.length) {
+                    openScreenshotEditor(canvas.toDataURL());
+                }
+            };
+            img.src = dataUrl;
+        });
+    };
+    firstImage.src = images[0];
+}
+
 // 打开截图编辑器
 function openScreenshotEditor(dataUrl) {
     // 创建一个新的标签页来编辑截图
@@ -386,6 +584,51 @@ function openScreenshotEditor(dataUrl) {
         dataUrl: dataUrl
     });
 }
+
+// 添加样式
+const style = document.createElement('style');
+style.textContent = `
+    .magnifier {
+        display: none;
+    }
+    .screenshot-overlay:hover .magnifier {
+        display: block;
+    }
+    .shortcuts-tips {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        z-index: 1000000;
+    }
+    .scroll-capture-overlay {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 10px;
+        border-radius: 4px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        z-index: 1000000;
+    }
+    .scroll-capture-controls button {
+        padding: 8px 16px;
+        margin: 5px;
+        border: none;
+        border-radius: 4px;
+        background: #1a73e8;
+        color: white;
+        cursor: pointer;
+    }
+    .scroll-capture-controls button:hover {
+        background: #1557b0;
+    }
+`;
+document.head.appendChild(style);
 
 // 初始化截图工具
 initScreenshotTool();

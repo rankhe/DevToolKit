@@ -2,7 +2,8 @@
   "manifest_version": 3,
   "default_locale": "zh_CN",
   "content_security_policy": {
-    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'",
+    "sandbox": "sandbox allow-scripts allow-forms allow-popups allow-modals; script-src 'self' 'unsafe-inline' 'unsafe-eval'; worker-src blob:"
   },
   "name": "__MSG_appName__",
   "description": "__MSG_appDescription__",
@@ -23,7 +24,8 @@
     "clipboardWrite",
     "contextMenus",
     "desktopCapture",
-    "tabs"
+    "tabs",
+    "notifications"
   ],
   "host_permissions": [
     "<all_urls>"
@@ -36,14 +38,29 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["js/content-scripts/json-format-content.js"],
+      "js": [
+        "js/content-scripts/json-format-content.js",
+        "js/content-scripts/screenshot-content.js"
+      ],
+      "css": ["css/screenshot-tool.css"],
       "run_at": "document_end"
     }
   ],
+  "background": {
+    "service_worker": "js/background.js"
+  },
   "web_accessible_resources": [
     {
       "resources": ["css/json-format.css"],
       "matches": ["<all_urls>"]
     }
-  ]
+  ],
+  "commands": {
+    "capture_viewport": {
+      "suggested_key": {
+        "default": "Alt+Shift+S"
+      },
+      "description": "截取当前视口"
+    }
+  }
 }
