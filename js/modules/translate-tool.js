@@ -42,7 +42,14 @@ class TranslateTool {
     await this.loadConfig();
     this.initLanguageCodes();
     this.bindEvents();
-    this.initContextMenu();
+    
+    // 检查是否在popup页面中
+    const isPopup = window.location.pathname.endsWith('popup.html');
+    
+    // 只在非popup页面中初始化上下文菜单
+    if (!isPopup) {
+      this.initContextMenu();
+    }
   }
   
   /**
@@ -609,31 +616,11 @@ class TranslateTool {
   }
 
   initContextMenu() {
-    // 创建菜单项，如果已存在则会自动更新
-    try {
-      chrome.contextMenus?.create({
-        id: 'translateSelection',
-        title: '翻译选中文本',
-        contexts: ['selection']
-      }, () => {
-        // 捕获可能的错误
-        if (chrome.runtime.lastError) {
-          this.logDebug('warn', 'Context Menu', 'Menu item already exists or other error occurred');
-        }
-      });
-    } catch (e) {
-      this.logDebug('error', 'Context Menu', e);
+    // 在popup页面中，不创建上下文菜单
+    if (chrome.runtime?.getManifest().manifest_version === 3) {
+      // 仅在后台脚本中处理上下文菜单
+      return;
     }
-
-    chrome.contextMenus?.onClicked.addListener((info, tab) => {
-      if (info.menuItemId === 'translateSelection') {
-        const sourceText = document.querySelector('#sourceText');
-        if (sourceText) {
-          sourceText.value = info.selectionText;
-          this.translate();
-        }
-      }
-    });
   }
 }
 

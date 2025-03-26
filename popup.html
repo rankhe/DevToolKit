@@ -73,6 +73,7 @@
             <button class="btn" id="jsonFormat">格式化</button>
             <button class="btn" id="jsonCompress">压缩</button>
             <button class="btn" id="jsonCopy">复制</button>
+            <button class="btn" id="formatPageJson">格式化页面</button>
           </div>
         </div>
         <div class="editor-container">
@@ -382,27 +383,6 @@
                 placeholder="在此输入要处理的文本...&#10;支持多行文本处理&#10;自动检测URL格式"
                 spellcheck="false"
               ></textarea>
-              <div class="file-upload">
-                <input 
-                  type="file" 
-                  id="encodeFile" 
-                  class="file-input"
-                  accept="text/*,image/*"
-                  title="选择要处理的文件"
-                >
-                <label for="encodeFile" class="file-label" title="选择文件进行编码或计算哈希">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <line x1="12" y1="18" x2="12" y2="12"></line>
-                    <line x1="9" y1="15" x2="15" y2="15"></line>
-                  </svg>
-                  选择文件
-                </label>
-              </div>
-              <div id="filePreview" class="file-preview" title="文件预览区域">
-                <div class="file-drop-zone">拖放文件到此处或点击上方按钮选择文件</div>
-              </div>
             </div>
             <div class="encode-output-group" data-label="输出">
               <textarea 

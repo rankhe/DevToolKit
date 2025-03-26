@@ -1,0 +1,68 @@
+/* JSON格式化样式 */
+.json-formatted {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    background-color: #f8f9fa;
+    color: #333;
+    padding: 20px;
+    border-radius: 4px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    margin: 0;
+    overflow: auto;
+    max-width: 100%;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.json-formatted .key { 
+    color: #2196F3; 
+    font-weight: bold;
+}
+
+.json-formatted .string { 
+    color: #4CAF50; 
+}
+
+.json-formatted .number { 
+    color: #F44336; 
+}
+
+.json-formatted .boolean { 
+    color: #9C27B0; 
+}
+
+.json-formatted .null { 
+    color: #607D8B; 
+    font-style: italic;
+}
+
+/* 暗色主题支持 */
+@media (prefers-color-scheme: dark) {
+    .json-formatted {
+        background-color: #1E1E1E;
+        color: #D4D4D4;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+    
+    .json-formatted .key { 
+        color: #9CDCFE; 
+    }
+    
+    .json-formatted .string { 
+        color: #CE9178; 
+    }
+    
+    .json-formatted .number { 
+        color: #B5CEA8; 
+    }
+    
+    .json-formatted .boolean { 
+        color: #569CD6; 
+    }
+    
+    .json-formatted .null { 
+        color: #569CD6; 
+        font-style: italic;
+    }
+}

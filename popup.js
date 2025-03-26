@@ -35,8 +35,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // 初始化翻译工具
-    new TranslateTool();
+    // 初始化翻译工具 - 使用单例模式确保只初始化一次
+    if (!window.translateToolInstance) {
+        window.translateToolInstance = new TranslateTool();
+    }
     
     // 初始化主题
     initTheme(null, chart);

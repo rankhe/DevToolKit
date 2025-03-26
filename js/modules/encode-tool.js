@@ -16,9 +16,12 @@ function debounce(func, wait) {
 
 // 哈希函数工具类
 class HashUtils {
+    // MD5 不是 Web Crypto API 的标准算法，使用外部库或替代方法
     static async md5(message) {
+        // 由于 Web Crypto API 不支持 MD5，我们使用 SHA-256 作为替代
+        // 实际应用中应添加提示或使用第三方库
         const msgBuffer = new TextEncoder().encode(message);
-        const hashBuffer = await crypto.subtle.digest('MD5', msgBuffer);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
         return Array.from(new Uint8Array(hashBuffer))
             .map(b => b.toString(16).padStart(2, '0'))
             .join('');
@@ -254,6 +257,7 @@ export function initEncodeTool() {
                         break;
                     case 'md5':
                         result = await HashUtils.md5(input + salt);
+                        showNotification('注意：Web Crypto API 不支持 MD5，已使用 SHA-256 替代', 'warning');
                         break;
                     case 'sha1':
                         result = await HashUtils.sha1(input + salt);
